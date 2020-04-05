@@ -1,0 +1,12 @@
+[Unit]
+Description=Detect if either washer or dryer has started or stopped
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python vibration.py vibration_settings.ini
+WorkingDirectory=/home/pi/rpi-appliance-monitor
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
