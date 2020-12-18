@@ -1,5 +1,7 @@
 RPi.GPIO>=0.6,<1
 requests>=2.19,<3
 tweepy>=3.6,<4
-slackclient>=1.3,<2
+slack-sdk
 paho-mqtt>=1.4,<2
+configparser
+python-vlc

@@ -12,10 +12,10 @@ import json
 import tweepy
 from time import localtime, strftime
 import paho.mqtt.publish as mqttpublish
-
-from ConfigParser import SafeConfigParser
+import vlc
+import configparser
 from tweepy import OAuthHandler as TweetHandler
-from slackclient import SlackClient
+# from slack import SlackClient
 
 PUSHOVER_SOUNDS = None
 
@@ -212,28 +212,35 @@ def vibrated(pin):
     global vibrating
     global last_vibration_time
     global start_vibration_time
-    logging.debug('{} vibrated'.format('Washer' if pin == 17 else 'Dryer'))
+    logging.info('Vibrated')
     last_vibration_time = time.time()
     if not vibrating:
         start_vibration_time = last_vibration_time
         vibrating = True
 
 
+def make_very_loud_noise():
+    logging.info('Commence very loud noise....fuck you neighbors!!')
+    p = vlc.MediaPlayer("sounds/most_annoying_sound_in_world.mp3")
+    p.play()
+
 def heartbeat():
     current_time = time.time()
-    logging.debug("Heartbeat")
+    if int(current_time) % 60 == 0:
+        logging.debug("Heartbeat")
     global vibrating
     delta_vibration = last_vibration_time - start_vibration_time
     if (vibrating and delta_vibration > begin_seconds
             and not appliance_active):
         send_appliance_active_message()
+        make_very_loud_noise()
     if (not vibrating and appliance_active
             and current_time - last_vibration_time > end_seconds):
         send_appliance_inactive_message()
     vibrating = current_time - last_vibration_time < 2
     threading.Timer(1, heartbeat).start()
 
-config = SafeConfigParser()
+config = configparser.ConfigParser()
 config.read(sys.argv[1])
 logfile = config.get('main', 'LOGFILE')
 handler = TimedRotatingFileHandler(logfile, when='midnight', interval=1, backupCount=20)
@@ -279,7 +286,7 @@ twitter_access_token_secret = config.get('twitter', 'access_token_secret')
 slack_api_token = config.get('slack', 'api_token')
 slack_webhook_url = config.get('slack','webhook_url')
 iftt_maker_channel_event = config.get('iftt','maker_channel_event')
-iftt_maker_channel_keys = config.get('iftt','maker_channel_keys').split(" ")
+iftt_maker_channel_keys = config.get('iftt','maker_channel_keys')
 email_recipient = config.get('email', 'recipient')
 email_sender = config.get('email', 'sender')
 email_password = config.get('email', 'password')

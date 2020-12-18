@@ -1,0 +1,12 @@
+[Unit]
+Description=Detect vibration
+After=network.target
+
+[Service]
+ExecStart=/home/gary/rpi-appliance-monitor/venv/bin/python vibration.py vibration_settings.ini
+WorkingDirectory=/home/gary/rpi-appliance-monitor
+Restart=always
+User=gary
+
+[Install]
+WantedBy=multi-user.target
